@@ -1,6 +1,10 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Home, Heart, Settings, LogOut, TrendingUp, TrendingDown, DollarSign, SearchIcon } from 'lucide-react'
+import { signOut } from 'firebase/auth'
+import { auth } from '../lib/firebase'
+import {
+  Home, Heart, Settings, LogOut, TrendingUp, TrendingDown, DollarSign, SearchIcon
+} from 'lucide-react'
 
 export default function HomePage() {
   const [activePage, setActivePage] = useState('Dashboard')
@@ -11,9 +15,15 @@ export default function HomePage() {
     setActivePage(page)
   }
 
-  const handleSignOut = () => {
-    // Add your sign out logic here
-    navigate('/') // Navigate to the SignIn page
+  
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth)                 // clear Firebase session + persistence
+      navigate('/', { replace: true })    // then go to sign-in
+    } catch (e) {
+      console.error('Sign out failed:', e)
+    }
   }
 
   const toggleLike = (company) => {
@@ -80,6 +90,7 @@ export default function HomePage() {
               <p className="text-gray-400">@bryanram</p>
             </div>
             <button
+              type="button"
               onClick={handleSignOut}
               className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md flex items-center"
             >
@@ -91,14 +102,6 @@ export default function HomePage() {
       </header>
       <main className="flex-1 p-8 overflow-auto">
         <div className="container mx-auto">
-          <div className="grid md:grid-cols-2 gap-8 mb-8">
-            <div className="bg-gray-800 p-6 rounded-lg">
-              <StockChart />
-            </div>
-            <div className="bg-gray-800 p-6 rounded-lg">
-              <StockAllocation />
-            </div>
-          </div>
           {/* Sentiment Boxes */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {sentimentData.map((item, index) => (
