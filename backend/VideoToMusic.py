@@ -3,7 +3,8 @@ from openai import OpenAI
 from dotenv import load_dotenv
 from DataFromVideo import DataFromVideo
 from SunoMusicGenerator import SunoMusicGenerator
-from moviepy.editor import VideoFileClip, AudioFileClip, CompositeAudioClip, afx
+from moviepy.editor import VideoFileClip, AudioFileClip, afx
+import time
 
 
 def prompt_gpt(
@@ -86,6 +87,19 @@ Output only the music prompt text, nothing else.
     tags = "background"
     suno = SunoMusicGenerator()
     clip_id = suno.prompt_suno(video_prompt, tags)
-    audio_path = f"backend/test/downloads/{clip_id}.mp3"
+    audio_path = (
+        f"/home/bkhwaja/hackathons/Mit_Hacks/backend/test/downloads/{clip_id}.mp3"
+    )
+    # audio_path = f"backend/test/downloads/{clip_id}.mp3"
+    # Wait for the audio file to be created (max 60 seconds)
+    timeout = 60
+    waited = 0
+    while not os.path.exists(audio_path) and waited < timeout:
+        print(f"Waiting for audio file {audio_path} to be created...")
+        time.sleep(2)
+        waited += 2
+
+    if not os.path.exists(audio_path):
+        raise FileNotFoundError(f"Audio file not found after waiting: {audio_path}")
     merge_music_and_video(video_path, audio_path)
     # return {"message": "Success on creating the audio file."}
