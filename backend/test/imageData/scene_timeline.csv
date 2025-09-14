@@ -1,0 +1,6 @@
+start_sec,end_sec,scene_label,confidence
+0,5.0,surfing water,0.353
+5,10.0,kitesurfing,0.187
+10,15.0,jetskiing,0.35
+15,20.0,surfing water,0.301
+20,22.966666666666665,surfing water,0.265
