@@ -1,6 +1,6 @@
 // src/lib/firebase.js
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInAnonymously } from "firebase/auth";
 import {
   initializeFirestore,
   doc,
@@ -47,4 +47,11 @@ export async function ensureUserDoc(user) {
       stats: { generations: 0, downloads: 0 },
     });
   }
+}
+
+// Ensure an auth user exists before uploads/reads
+export async function ensureSignedIn() {
+  if (auth.currentUser) return auth.currentUser;
+  const { user } = await signInAnonymously(auth);
+  return user;
 }

@@ -7,6 +7,11 @@ import { Play, Pause, Download, RefreshCw, Volume2, AudioWaveform as Waveform, S
 import { storage } from "../lib/firebase"
 import { ref, getDownloadURL } from "firebase/storage"
 
+import { auth, db } from "../lib/firebase"
+import { doc, onSnapshot } from "firebase/firestore"
+import { onAuthStateChanged } from "firebase/auth";
+
+
 const GeneratePage = () => {
   const location = useLocation()
   const navigate = useNavigate()
@@ -17,8 +22,12 @@ const GeneratePage = () => {
   const aiVideoPath   = location.state?.aiVideoPath
   const generationDoc = location.state?.generationDoc // when opened from Dashboard
 
-  const resolvedTrackPath    = trackPath  || generationDoc?.track?.storagePath
-  const resolvedAIVideoPath  = aiVideoPath || generationDoc?.ai_video?.storagePath
+  const [resolvedTrackPath, setResolvedTrackPath] = useState(
+    trackPath || generationDoc?.track?.storagePath || null
+  )
+  const [resolvedAIVideoPath, setResolvedAIVideoPath] = useState(
+    aiVideoPath || generationDoc?.ai_video?.storagePath || null
+  )
 
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
@@ -54,23 +63,68 @@ const handleDownloadAIVideo = () =>
   useEffect(() => {
     if (!videoFile && !genId && !generationDoc) {
       navigate("/upload")
-      return
     }
+  }, [videoFile, genId, generationDoc, navigate])
 
-    // Simulate music generation
-    const timer = setTimeout(() => {
-      setGenerating(false)
-      setGeneratedTrack({
-        title: "Epic Adventure Theme",
-        genre: "Cinematic",
-        mood: "Uplifting, Energetic",
-        duration: "3:02",
-        bpm: 128,
-      })
-    }, 3000)
-
-    return () => clearTimeout(timer)
-  }, [videoFile, navigate])
+  useEffect(() => {
+    // If opened from Upload flow, we have uid implicitly via auth on backend.
+    // Here we listen to the generation doc using the uid embedded in Storage path.
+    // Prefer: when you navigate here from Dashboard, pass the whole doc as "generationDoc".
+    const path = generationDoc ? generationDoc._path?.segments : null
+    // Fallback: derive uid/genId from resolved Storage paths if needed (optional).
+    if (!generationDoc && !genId) return
+  
+    // If you open from Dashboard, you can pass uid in location.state; otherwise
+    // you can keep a "userUid" in your dashboard router state. For now we assume
+    // Generate opened from Upload flow; only genId is needed because Dashboard opens with generationDoc.
+    const uid = generationDoc?.uid // (optional if you embed it)
+    if (!uid && !generationDoc) return
+  
+    const dref = generationDoc
+      ? doc(db, "users", generationDoc.uid, "generations", generationDoc.id)
+      : doc(db, "users", auth.currentUser.uid, "generations", genId)
+  
+    const unsub = onSnapshot(dref, (snap) => {
+      if (!snap.exists()) return
+      const data = snap.data()
+      // enable download buttons when ready flags flip true
+      if (data?.track?.ready || data?.ai_video?.ready) {
+        setGenerating(false)
+      }
+    })
+    return () => unsub()
+  }, [genId, generationDoc])
+    
+  useEffect(() => {
+    let unsubAuth;
+    let unsubDoc;
+  
+    unsubAuth = onAuthStateChanged(auth, (user) => {
+      if (!user || !genId) return;
+      const uid = user.uid;
+      const dref = doc(db, "users", uid, "generations", genId);
+  
+      unsubDoc = onSnapshot(dref, (snap) => {
+        if (!snap.exists()) return;
+        const data = snap.data();
+  
+        // Flip UI when backend marks files ready
+        if (data?.track?.ready || data?.ai_video?.ready) {
+          setGenerating(false);
+        }
+  
+        // Optional: refresh paths from Firestore (even if router state had them)
+        if (data?.track?.storagePath) setResolvedTrackPath(data.track.storagePath);
+        if (data?.ai_video?.storagePath) setResolvedAIVideoPath(data.ai_video.storagePath);
+      });
+    });
+  
+    return () => {
+      if (unsubDoc) unsubDoc();
+      if (unsubAuth) unsubAuth();
+    };
+  }, [genId]);
+  
 
   const togglePlayback = () => {
     setIsPlaying(!isPlaying)
@@ -350,12 +404,13 @@ const handleDownloadAIVideo = () =>
 
             {/* Action Buttons */}
             <div className="flex space-x-4">
-              <button onClick={handleDownloadTrack} className="flex-1 flex items-center justify-center px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl font-semibold hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/25">
+              <button disabled={!resolvedTrackPath} onClick={handleDownloadTrack} className="flex-1 flex items-center justify-center px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl font-semibold hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/25">
                 <Download className="w-5 h-5 mr-2" />
                 Download Track
               </button>
 
               <button
+                disabled={!resolvedAIVideoPath}
                 onClick={handleSaveToLibrary}
                 className="flex-1 px-6 py-3 border border-purple-500/50 rounded-xl font-semibold hover:bg-purple-500/10 transition-all transform hover:scale-105"
               >

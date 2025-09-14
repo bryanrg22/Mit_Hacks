@@ -9,6 +9,7 @@ import AuthPage from "./pages/AuthPage"
 import UploadPage from "./pages/UploadPage"
 import GeneratePage from "./pages/GeneratePage"
 import DashboardPage from "./pages/DashboardPage"
+import LocalPrototypePage from "./pages/LocalPrototypePage.jsx";
 
 function PrivateRoute({ children }) {
   const [user, setUser] = useState(undefined)
@@ -50,6 +51,7 @@ const App = () => (
         }
       />
       <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="/local" element={<LocalPrototypePage />} />
     </Routes>
   </Router>
 )

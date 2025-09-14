@@ -4,9 +4,10 @@ import { useState, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import { Upload, Video, Music, ArrowRight, X, CheckCircle, ArrowLeft } from "lucide-react"
 
-import { auth, db, storage } from "../lib/firebase"
-import { doc, setDoc, serverTimestamp } from "firebase/firestore"
-import { ref, uploadBytesResumable } from "firebase/storage"
+import { ensureSignedIn, auth, db, storage } from "../lib/firebase";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { onAuthStateChanged } from "firebase/auth";
 
 const UploadPage = () => {
   const [dragActive, setDragActive] = useState(false)
@@ -65,32 +66,24 @@ const UploadPage = () => {
   }
 
   const startAnalysis = async () => {
-    if (!uploadedFile) return
-    const user = auth.currentUser
-    if (!user) { navigate("/auth"); return }
-  
-    setAnalyzing(true); setProgress(0)
-  
-    // ids + deterministic storage paths
-    const genId = crypto.randomUUID()
-    const inputExt = (uploadedFile.name.split(".").pop() || "mp4").toLowerCase()
-  
-    const normalVideoPath = `users/${user.uid}/generations/${genId}/input.${inputExt}`
-    const trackPath       = `users/${user.uid}/generations/${genId}/track.mp3`
-    const aiVideoPath     = `users/${user.uid}/generations/${genId}/ai.mp4`
-  
-    // 1) upload original video with progress
-    const task = uploadBytesResumable(ref(storage, normalVideoPath), uploadedFile)
-    await new Promise((resolve, reject) => {
-      task.on("state_changed",
-        (s) => setProgress(Math.min(99, Math.round((s.bytesTransferred / s.totalBytes) * 100))),
-        reject,
-        () => resolve()
-      )
-    })
-  
-    // 2) create Firestore doc (renamed fields + prefilled paths)
-    await setDoc(doc(db, "users", user.uid, "generations", genId), {
+    if (!uploadedFile) return;
+    setAnalyzing(true);
+    setProgress(0);
+
+    // ✅ MUST be signed in before any Storage upload (fixes CORS/401)
+    const user = await ensureSignedIn();
+    const uid = user.uid;
+
+    // IDs + deterministic storage paths
+    const genId = crypto.randomUUID();
+    const inputExt = (uploadedFile.name.split(".").pop() || "mp4").toLowerCase();
+    const normalVideoPath = `users/${uid}/generations/${genId}/input.${inputExt}`;
+    const trackPath       = `users/${uid}/generations/${genId}/track.mp3`;
+    const aiVideoPath     = `users/${uid}/generations/${genId}/ai.mp4`;
+
+    // 1) Create/update the Firestore doc first so /generate can listen immediately
+    const genRef = doc(db, "users", uid, "generations", genId);
+    await setDoc(genRef, {
       title: uploadedFile.name,
       status: "queued",
       createdAt: serverTimestamp(),
@@ -98,13 +91,52 @@ const UploadPage = () => {
       normal_video: { storagePath: normalVideoPath },
       ai_video:     { storagePath: aiVideoPath, ready: false },
       track:        { storagePath: trackPath,   ready: false },
-    })
-  
-    // 3) navigate to Results with everything needed (no reads there)
-    navigate("/generate", {
-      state: { videoFile: uploadedFile, genId, trackPath, aiVideoPath }
-    })
-  }
+    }, { merge: true });
+
+    // 2) Upload original video with progress
+    const task = uploadBytesResumable(ref(storage, normalVideoPath), uploadedFile);
+    try {
+      await new Promise((resolve, reject) => {
+        task.on(
+          "state_changed",
+          (s) => setProgress(Math.min(99, Math.round((s.bytesTransferred / s.totalBytes) * 100))),
+          reject,
+          resolve
+        );
+      });
+    } catch (e) {
+      console.error("Upload failed", e);
+      await setDoc(genRef, { status: "error", lastClientError: String(e), updatedAt: serverTimestamp() }, { merge: true });
+      setAnalyzing(false);
+      return;
+    }
+
+    // 3) Tell backend to start the pipeline
+    await setDoc(genRef, { status: "processing", updatedAt: serverTimestamp() }, { merge: true });
+    try {
+      const resp = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/process`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          uid,
+          genId,
+          title: uploadedFile.name,
+          inputPath: normalVideoPath,
+          trackPath,
+          aiVideoPath
+        })
+      });
+      if (!resp.ok) throw new Error(`backend responded ${resp.status}`);
+    } catch (e) {
+      console.error("Failed to trigger backend:", e);
+      await setDoc(genRef, { status: "error", lastServerError: String(e), updatedAt: serverTimestamp() }, { merge: true });
+      setAnalyzing(false);
+      return;
+    }
+
+    // 4) Navigate to Generate page; it will pick up via the onSnapshot listener
+    navigate("/generate", { state: { videoFile: uploadedFile, genId, trackPath, aiVideoPath } });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white">
