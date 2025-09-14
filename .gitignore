@@ -5,3 +5,13 @@
 >>>>>>> basil-suno
 .DS_Store
 **/.DS_Store
+# Env & secrets
+.env
+.env.local
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
