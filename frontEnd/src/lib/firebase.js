@@ -25,11 +25,11 @@ export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: "select_account" });
 
-// Firestore — FORCE long-polling (do NOT enable autoDetect at the same time)
 export const db = initializeFirestore(app, {
-  experimentalForceLongPolling: true,
-  useFetchStreams: false,
   ignoreUndefinedProperties: true,
+  experimentalAutoDetectLongPolling: true, // let SDK fall back only when needed
+  // (optional) keep default fetch streams ON
+  // useFetchStreams: true,
 });
 
 // Storage
