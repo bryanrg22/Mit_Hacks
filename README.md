@@ -1,5 +1,9 @@
 # Nosu - HackMIT 2025 
 
+<div align="center">
+  <img alt="banner" width="600" height="600" alt="Image" src="https://github.com/user-attachments/assets/3334e6b0-d461-4e61-8419-e96713671f83" />
+</div>
+
 HackMIT 2025 - Nosu - AI Soundtracks for Every Scene
 
 Turn any short video into a perfectly-timed soundtrack using computer vision + LLM prompting + generative music, then auto-merge into a shareable MP4.
@@ -7,7 +11,7 @@ Turn any short video into a perfectly-timed soundtrack using computer vision + L
 What it does: analyzes the video (objects, captions, scene/action), crafts a concise music prompt, generates background music, and (optionally) muxes the track into the original clip—fully integrated with Firebase Auth, Firestore, and Storage.
 
 ## Video
-https://github.com/user-attachments/assets/9b1764ae-8a59-47af-8773-70a00b5dfb1d
+
 
 ## Tech Stack
 
@@ -33,7 +37,13 @@ https://github.com/user-attachments/assets/9b1764ae-8a59-47af-8773-70a00b5dfb1d
 
 ### AI Integration
 
-!!!!!!COMPLETE!!!!!!
+- **Firebase Firestore** - NoSQL Database
+- **Firebase Authentication** - User Management
+- **Firebase Storage** - File Storage
+
+<div align="center">
+  <img alt="banner" width="800" height="800" alt="Image" src="https://github.com/user-attachments/assets/2d8e0e5f-dca1-4055-a6c6-dec9ca796073" />
+</div>
 
 ## Installation
 
@@ -44,203 +54,99 @@ https://github.com/user-attachments/assets/9b1764ae-8a59-47af-8773-70a00b5dfb1d
 - Firebase account
 - FFmpeg (for MoviePy): brew install ffmpeg (macOS)
 
-### Frontend Setup
 
-1. Clone the repository
+## How It Works (End‑to‑End)
 
-    ```sh
-    git clone https://github.com/your-username/voltway-procurement.git
-    cd voltway-procurement
-    ```
+<div align="center">
+  <img alt="banner" width="800" height="800" alt="Image" src="https://github.com/user-attachments/assets/83b0c84d-5f35-4eb6-935d-87bccc885121" />
+</div>
 
-2. Install dependencies
+1. Upload → Storage (frontend)
+- User selects a video. Frontend uploads it to Firebase Storage under a deterministic path: users/{uid}/generations/{genId}/input.<ext>
+- Frontend creates a Firestore job doc and triggers the backend with { uid, genId, inputPath, trackPath, aiVideoPath }.
 
-    ```sh
-    npm install
-    ```
+2. Analyze Video (backend)
+- YOLO object detection, BLIP captions, and VideoMAE scene tags produce CSVs (frames/objects, captions, scenes).
 
-3. Create a `.env` file in the root directory with your Firebase configuration
+3. Craft Music Prompt (backend)
+- The analysis is condensed into a short, clean music prompt (mood/genre/instrumentation; ≤ 60s).
 
-    ```dotenv
-    VITE_FIREBASE_API_KEY=your_api_key
-    VITE_FIREBASE_AUTH_DOMAIN=your_auth_domain
-    VITE_FIREBASE_PROJECT_ID=your_project_id
-    VITE_FIREBASE_STORAGE_BUCKET=your_bucket   # e.g. your-project.appspot.com
-    VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-    VITE_FIREBASE_APP_ID=your_app_id
-    # backend
-    VITE_BACKEND_URL=http://localhost:8000
-    ```
+4. Generate Music (backend)
+- Calls Suno; polls until ready; downloads the MP3.
 
-### Backend Setup
+5. (Optional) Merge (backend)
+- Loops/trims the MP3 to the video duration and muxes with MoviePy.
 
-1. Navigate to the backend directory
+6. Download (frontend)
+- User clicks Download Track (track.mp3) or Download AI Video (ai.mp4) via signed URLs.
 
-    ```sh
-    cd backend
-    ```
-
-2. Create a virtual environment
-
-    ```sh
-    python -m venv venv
-    source venv/bin/activate  # On Windows: venv\Scripts\activate
-    ```
-
-3. Install dependencies
-
-    ```sh
-    python -m pip install --upgrade pip
-    python -m pip install -r requirements.txt
-    ```
-
-4. Create a `firebase-credentials.json` file with your Firebase service account credentials
-
-## Running the Application
-
-### Frontend
-
-```sh
-npm run dev
-```
-
-The frontend will be available at [http://localhost:3000](http://localhost:3000).
-
-### Backend
-
-```sh
-python app.py
-```
-
-The backend API will be available at [http://localhost:5000](http://localhost:5000).
 
 ## Firebase Database Schema
 
 ```plaintext
-firestore/
-├── orders/{order_id}                # e.g. orders/O5001
-│   ├── {order_id}
-│   │   ├── order_date: string
-│   │   ├── expected_delivery_date: string
-│   │   ├── actual_delivered_at: string
-│   │   ├── part_id: string             # FK → parts/{part_id}
-│   │   ├── supplier_id: string         # FK → supply/{supply_id}
-│   │   ├── quantity_ordered: number
-│   │   └── status: string              # "pending" | "ordered" | "delivered"
-│
-├── parts/{part_id}                  # e.g. parts/P301
-│   ├── {part_id}
-│   │   ├── part_name: string
-│   │   ├── part_type: string           # "assembly" | "component"
-│   │   ├── location: string
-│   │   ├── stock_level: number
-│   │   ├── min_stock: number
-│   │   ├── blocked: boolean
-│   │   ├── comments: string
-│   │   ├── weight: number | null
-│   │   ├── successor_part: string | null
-│   │   ├── used_in_models: string[]    # e.g. ["S1_V1","S2_V1"]
-│   │   ├── reorder_interval_days: number
-│   │   ├── reorder_quantity: number
-│   │   ├── bill_of_materials: array    # list of maps
-│   │   │   ├── [0]
-│   │   │   │   ├── Part_ID: string
-│   │   │   │   ├── Part_Name: string
-│   │   │   │   ├── Qty: number
-│   │   │   │   └── Notes: string
-│   │   │   ├── [1] { … }
-│   │   │   └── …
-│   │   └── requirements: string[]      # e.g. ["Torque motor mounting …", "Run battery BMS …"]
-│
-├── sales/{sale_id}                  # e.g. sales/S6000
-│   ├── {sale_id}
-│   │   ├── created_at: string
-│   │   ├── accepted_request_date: string
-│   │   ├── requested_date: string
-│   │   ├── model: string
-│   │   ├── version: string
-│   │   ├── order_type: string          # "webshop" | "retail"
-│   │   └── quantity: number
-│
-└── supply/{supply_id}               # e.g. supply/SupA_P301
-    ├── {supply_id}
-    │   ├── price_per_unit: number
-    │   ├── lead_time_days: number
-    │   ├── min_order_qty: number
-    │   └── reliability_rating: number
+users/{uid}
+└─ generations/{genId}
+• title: string
+• status: "queued" | "processing" | "audio_ready" | "complete" | "error"
+• createdAt: serverTimestamp
+• updatedAt: serverTimestamp
+• normal_video: { storagePath, durationSec?, fps?, width?, height?, mimeType? }
+• track: { storagePath, ready: boolean, duration?, codec?, bitrateKbps?, sampleRateHz?, clipId?, prompt? }
+• ai_video: { storagePath, ready: boolean, durationSec?, codec?, audioCodec?, sizeBytes?, mux? }
+• analysis: {
+objects_csv: { storagePath, rows }
+captions_csv: { storagePath, rows }
+scenes_csv: { storagePath, rows }
+summary?: { top_objects[], top_scenes[], sample_caps[] }
+music_prompt?: string
+}
+• progress?: number
+• errors?: [ { stage, message, ts } ]
 ```
 
-## Features
+Canonical Storage Paths
 
-### Dashboard
-
-- Overview of key metrics
-- Low stock alerts
-- Inventory status visualization
-- Sales charts
-- Supplier reliability analysis
-- Recent orders table
-
-### Products
-
-- View scooter models and their components
-- Track parts inventory for each model
-- Monitor stock levels and restock urgency
-
-### Parts Management
-
-- Track individual parts inventory
-- View part details and specifications
-- Monitor stock levels
-
-### Orders
-
-- Track purchase orders
-- Monitor delivery status
-- View order history
-
-### Supply Chain Map
-
-- Interactive global map
-- Visualize suppliers and warehouses
-- Track shipment routes
-
-### Hugo AI Assistant
-
-- AI-powered procurement assistant
-- Get insights on inventory status
-- Analyze supply chain data
-- Optimize procurement processes
-
-### Data Import
-
-- Import parts, orders, and sales data
-- Automatic database updates
-- AI-powered analysis after import
-
-### Notifications
-
-- AI-generated parts status updates
-- Low stock alerts
-- Integration with Slack for team notifications
+```plaintext
+users/{uid}/generations/{genId}/input.<ext>
+users/{uid}/generations/{genId}/analysis/frame_metadata.csv
+users/{uid}/generations/{genId}/analysis/detail_frame_metadata.csv
+users/{uid}/generations/{genId}/analysis/scene_timeline.csv
+users/{uid}/generations/{genId}/track.mp3
+users/{uid}/generations/{genId}/ai.mp4
+```
 
 ## Project Structure
 
 ```plaintext
-voltway-procurement/
-├── src/
-│   ├── components/       # Reusable UI components
-│   ├── pages/            # Page components
-│   ├── services/         # API and service functions
-│   ├── hooks/            # Custom React hooks
-│   ├── firebase.js       # Firebase configuration
-│   └── App.jsx           # Main application component
-├── backend/
-│   ├── app.py            # Flask application
-│   ├── routes/           # API routes
-│   └── services/         # Backend services
-└── public/               # Static assets
+project/
+├─ src/
+│ ├─ components/ # Reusable UI
+│ ├─ pages/ # Landing, Auth, Upload, Generate, Dashboard
+│ ├─ services/ # Firebase SDK wrappers, API client
+│ ├─ hooks/ # Auth/file upload hooks
+│ ├─ firebase.js # Client config & ensureUserDoc
+│ └─ App.jsx # Router + PrivateRoute
+├─ backend/
+│ ├─ main.py # FastAPI app (entrypoint)
+│ ├─ DataFromVideo.py # YOLO/BLIP/VideoMAE analysis
+│ ├─ VideoToMusic.py # prompt crafting + MoviePy merge
+│ ├─ SunoMusicGenerator.py
+│ ├─ requirements.txt
+│ └─ firebase-credentials.json (local only, not committed)
+└─ public/ # Static assets
 ```
+
+## Features
+
+- Email/Google Auth with Firebase
+- Upload & Track Jobs with Firestore + Storage
+- Computer Vision Analysis (objects, captions, scenes)
+- LLM Prompting for music description
+- Suno Integration for AI soundtrack generation
+- Optional Mux (loop/trim audio, background volume, H.264/AAC output)
+- Downloads of track and final video
+- Dashboard history view ordered by last update
+
 
 ## Contributing
 
