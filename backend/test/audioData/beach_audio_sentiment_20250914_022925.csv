@@ -1,0 +1,4 @@
+segment,start_time,end_time,duration,top_mood,confidence,top_2_mood,confidence_2,mood_3,score_3,analysis_timestamp
+1,0.0,7.82,7.82,angry,0.344,relaxing,0.294,dark,0.0958099402487278,2025-09-14T02:29:21.523887
+2,7.82,15.63,7.82,relaxing,0.344,angry,0.175,serene,0.154022965580225,2025-09-14T02:29:23.710163
+3,15.63,23.45,7.82,relaxing,0.243,angry,0.239,dark,0.11219357699155807,2025-09-14T02:29:25.825560
