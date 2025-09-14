@@ -43,14 +43,14 @@ def merge_music_and_video(video_path="", audio_path=""):
     background_audio = (
         AudioLoop.audio_loop(background_audio, duration=video_duration)
         if background_audio.duration < video_duration
-        else background_audio.subclip(0, video_duration)
+        else background_audio.subclipped(0, video_duration)
     )
-    background_audio = background_audio.volumex(0.5)
+    # background_audio = backgrou(0.5)
 
-    final_video = video.set_audio(background_audio)
+    final_video = video.with_audio(background_audio)
 
     # print("Video audio:", final_audio.duration)
-    print("Background audio duration:", background_audio.duration)
+    # print("Background audio duration:", background_audio)
 
     final_video.write_videofile(
         "output_video.mp4",

@@ -63,7 +63,7 @@ Keep responses concise (1-2 sentences per scene, under 200 characters).
 Focus only on mood, genre, and instrumentation. Avoid long explanations.
 Output only the music prompt text, nothing else.
 """
-    video_path = "/home/bkhwaja/hackathons/Mit_Hacks/backend/test/videos/beach.mp4"
+    video_path = 'test/videos/beach_audio.mp4'
     
     print("=" * 60)
     print("STARTING INTEGRATED VIDEO + AUDIO ANALYSIS")
@@ -140,7 +140,7 @@ CONFIDENCE WEIGHTING INSTRUCTIONS:
     tags = "background"
     suno = SunoMusicGenerator()
     clip_id = suno.prompt_suno(video_prompt, tags)
-    audio_path = f"/home/bkhwaja/hackathons/Mit_Hacks/backend/test/downloads/{clip_id}.mp3"
+    audio_path = f"test/downloads/{clip_id}.mp3"
     
     # 6. Wait for audio and merge with video
     print("\n6. Merging Music with Video...")
