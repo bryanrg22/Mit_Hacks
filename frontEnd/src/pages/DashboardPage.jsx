@@ -17,60 +17,53 @@ import {
   Sparkles,
 } from "lucide-react"
 import { signOut } from "firebase/auth"
-import { auth } from "../lib/firebase"
+import { auth, db, storage } from "../lib/firebase"
+import { ref, getDownloadURL } from "firebase/storage"
+import { onAuthStateChanged } from "firebase/auth"
+import { collection, query, orderBy, getDocs } from "firebase/firestore"
 
 const DashboardPage = () => {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedGenre, setSelectedGenre] = useState("all")
   const [filteredProjects, setFilteredProjects] = useState([])
 
-  const [projects] = useState([
-    {
-      id: 1,
-      title: "Mountain Adventure",
-      videoName: "hiking_trip.mp4",
-      trackName: "Epic Journey Theme",
-      genre: "Cinematic",
-      duration: "3:24",
-      createdAt: "2 hours ago",
-      thumbnail: "/mountain-hiking-adventure.png",
-    },
-    {
-      id: 2,
-      title: "City Vibes",
-      videoName: "urban_walk.mp4",
-      trackName: "Urban Pulse",
-      genre: "Electronic",
-      duration: "2:18",
-      createdAt: "1 day ago",
-      thumbnail: "/urban-city-street.png",
-    },
-    {
-      id: 3,
-      title: "Sunset Beach",
-      videoName: "beach_sunset.mp4",
-      trackName: "Peaceful Waves",
-      genre: "Ambient",
-      duration: "4:12",
-      createdAt: "3 days ago",
-      thumbnail: "/peaceful-sunset-beach-walk.jpg",
-    },
-    {
-      id: 4,
-      title: "Wedding Ceremony",
-      videoName: "wedding_highlights.mp4",
-      trackName: "Romantic Melody",
-      genre: "Classical",
-      duration: "5:45",
-      createdAt: "1 week ago",
-      thumbnail: "/wedding-ceremony-romantic.jpg",
-    },
-  ])
+  const [projects, setProjects] = useState([])
 
   const [hoveredCard, setHoveredCard] = useState(null)
   const [pulsingStats, setPulsingStats] = useState([])
 
   const navigate = useNavigate()
+
+  useEffect(() => {
+    const off = onAuthStateChanged(auth, async (user) => {
+    if (!user) { navigate("/auth"); return }
+    const gensRef = collection(db, "users", user.uid, "generations")
+    const q = query(gensRef, orderBy("updatedAt", "desc"))
+    const snap = await getDocs(q)
+    const items = snap.docs.map((d) => {
+      const data = d.data() || {}
+      const title = data.title || "Untitled"
+      const normPath = data.normal_video?.storagePath || ""
+      const trackPath = data.track?.storagePath || ""
+      const videoName = normPath ? normPath.split("/").pop() : title
+      const trackName = trackPath ? trackPath.split("/").pop() : "track.mp3"
+      return {
+        id: d.id,
+        title,
+        videoName,
+        trackName,
+        genre: data.track?.genre || "—",
+        duration: data.track?.duration || "—",
+        createdAt: data.createdAt?.toDate ? data.createdAt.toDate().toLocaleDateString() : "",
+        thumbnail: data.thumbnailUrl || "/placeholder.svg",
+        _raw: data,
+      }
+    })
+    setProjects(items)
+  })
+  return () => off()
+  }, [navigate])
+  
 
   useEffect(() => {
     let filtered = projects.filter(
@@ -95,6 +88,29 @@ const DashboardPage = () => {
       console.error("Error signing out:", error)
     }
   }
+
+  const handleCardDownload = async (project) => {
+    // Prefer the audio track; fall back to the AI muxed video if needed
+    const path =
+      project._raw?.track?.storagePath ||
+      project._raw?.ai_video?.storagePath
+  
+    if (!path) { alert("No downloadable file on this project yet."); return }
+  
+    try {
+      const url = await getDownloadURL(ref(storage, path))
+      const a = document.createElement("a")
+      a.href = url
+      a.download = path.split("/").pop() || "download"
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+    } catch (e) {
+      console.error(e)
+      alert("File isn’t ready yet. Try again shortly.")
+    }
+  }
+  
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white">
@@ -260,6 +276,7 @@ const DashboardPage = () => {
                 className="group bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-xl border border-purple-500/20 rounded-2xl overflow-hidden hover:border-purple-500/40 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-purple-500/10"
                 onMouseEnter={() => setHoveredCard(project.id)}
                 onMouseLeave={() => setHoveredCard(null)}
+                onClick={() => navigate("/generate", { state: { generationDoc: project._raw, genId: project.id } })}
               >
                 {/* Thumbnail */}
                 <div className="aspect-video bg-gradient-to-br from-gray-800 to-gray-900 relative overflow-hidden">
@@ -307,7 +324,7 @@ const DashboardPage = () => {
                       <button className="p-2 hover:bg-purple-500/20 hover:text-purple-300 rounded-lg transition-all duration-300 transform hover:scale-110">
                         <Play className="w-4 h-4" />
                       </button>
-                      <button className="p-2 hover:bg-blue-500/20 hover:text-blue-300 rounded-lg transition-all duration-300 transform hover:scale-110">
+                      <button onClick={(e) => { e.stopPropagation(); handleCardDownload(project) }} className="p-2 hover:bg-blue-500/20 hover:text-blue-300 rounded-lg transition-all duration-300 transform hover:scale-110">
                         <Download className="w-4 h-4" />
                       </button>
                       <button className="p-2 hover:bg-red-500/20 text-red-400 rounded-lg transition-all duration-300 transform hover:scale-110">

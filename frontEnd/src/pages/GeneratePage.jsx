@@ -4,23 +4,55 @@ import { useState, useEffect, useRef } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { Play, Pause, Download, RefreshCw, Volume2, AudioWaveform as Waveform, Sparkles } from "lucide-react"
 
+import { storage } from "../lib/firebase"
+import { ref, getDownloadURL } from "firebase/storage"
+
 const GeneratePage = () => {
   const location = useLocation()
   const navigate = useNavigate()
+
+  const videoFile     = location.state?.videoFile
+  const genId         = location.state?.genId
+  const trackPath     = location.state?.trackPath
+  const aiVideoPath   = location.state?.aiVideoPath
+  const generationDoc = location.state?.generationDoc // when opened from Dashboard
+
+  const resolvedTrackPath    = trackPath  || generationDoc?.track?.storagePath
+  const resolvedAIVideoPath  = aiVideoPath || generationDoc?.ai_video?.storagePath
+
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(180) // 3 minutes
   const [generating, setGenerating] = useState(true)
   const [generatedTrack, setGeneratedTrack] = useState(null)
   const [isEditingName, setIsEditingName] = useState(false)
-  const [projectName, setProjectName] = useState("Epic Adventure Theme")
+  const [projectName, setProjectName] = useState(generationDoc?.title || "Epic Adventure Theme")
   const audioRef = useRef(null)
   const [isDragging, setIsDragging] = useState(false)
 
-  const videoFile = location.state?.videoFile
+  const triggerDownload = async (path, suggestedName) => {
+  if (!path) { alert("No file available to download yet."); return }
+  try {
+    const url = await getDownloadURL(ref(storage, path))
+    const a = document.createElement("a")
+    a.href = url
+    a.download = suggestedName || path.split("/").pop() || "download"
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+  } catch (err) {
+    console.error("Download failed:", err)
+    alert("File is not ready yet. Try again in a moment.")
+  }
+}
+const handleDownloadTrack = () =>
+  triggerDownload(resolvedTrackPath, `${projectName || "track"}.mp3`)
+const handleDownloadAIVideo = () =>
+  triggerDownload(resolvedAIVideoPath, `${projectName || "video"}.mp4`)
+  
 
   useEffect(() => {
-    if (!videoFile) {
+    if (!videoFile && !genId && !generationDoc) {
       navigate("/upload")
       return
     }
@@ -318,7 +350,7 @@ const GeneratePage = () => {
 
             {/* Action Buttons */}
             <div className="flex space-x-4">
-              <button className="flex-1 flex items-center justify-center px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl font-semibold hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/25">
+              <button onClick={handleDownloadTrack} className="flex-1 flex items-center justify-center px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl font-semibold hover:from-purple-700 hover:to-blue-700 transition-all transform hover:scale-105 hover:shadow-lg hover:shadow-purple-500/25">
                 <Download className="w-5 h-5 mr-2" />
                 Download Track
               </button>

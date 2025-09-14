@@ -4,6 +4,10 @@ import { useState, useRef } from "react"
 import { useNavigate } from "react-router-dom"
 import { Upload, Video, Music, ArrowRight, X, CheckCircle, ArrowLeft } from "lucide-react"
 
+import { auth, db, storage } from "../lib/firebase"
+import { doc, setDoc, serverTimestamp } from "firebase/firestore"
+import { ref, uploadBytesResumable } from "firebase/storage"
+
 const UploadPage = () => {
   const [dragActive, setDragActive] = useState(false)
   const [uploadedFile, setUploadedFile] = useState(null)
@@ -60,23 +64,46 @@ const UploadPage = () => {
     }
   }
 
-  const startAnalysis = () => {
-    setAnalyzing(true)
-    setProgress(0)
-
-    // Simulate analysis progress
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval)
-          setTimeout(() => {
-            navigate("/generate", { state: { videoFile: uploadedFile } })
-          }, 1000)
-          return 100
-        }
-        return prev + Math.random() * 15
-      })
-    }, 500)
+  const startAnalysis = async () => {
+    if (!uploadedFile) return
+    const user = auth.currentUser
+    if (!user) { navigate("/auth"); return }
+  
+    setAnalyzing(true); setProgress(0)
+  
+    // ids + deterministic storage paths
+    const genId = crypto.randomUUID()
+    const inputExt = (uploadedFile.name.split(".").pop() || "mp4").toLowerCase()
+  
+    const normalVideoPath = `users/${user.uid}/generations/${genId}/input.${inputExt}`
+    const trackPath       = `users/${user.uid}/generations/${genId}/track.mp3`
+    const aiVideoPath     = `users/${user.uid}/generations/${genId}/ai.mp4`
+  
+    // 1) upload original video with progress
+    const task = uploadBytesResumable(ref(storage, normalVideoPath), uploadedFile)
+    await new Promise((resolve, reject) => {
+      task.on("state_changed",
+        (s) => setProgress(Math.min(99, Math.round((s.bytesTransferred / s.totalBytes) * 100))),
+        reject,
+        () => resolve()
+      )
+    })
+  
+    // 2) create Firestore doc (renamed fields + prefilled paths)
+    await setDoc(doc(db, "users", user.uid, "generations", genId), {
+      title: uploadedFile.name,
+      status: "queued",
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      normal_video: { storagePath: normalVideoPath },
+      ai_video:     { storagePath: aiVideoPath, ready: false },
+      track:        { storagePath: trackPath,   ready: false },
+    })
+  
+    // 3) navigate to Results with everything needed (no reads there)
+    navigate("/generate", {
+      state: { videoFile: uploadedFile, genId, trackPath, aiVideoPath }
+    })
   }
 
   return (

@@ -8,7 +8,7 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
 } from "firebase/auth"
-import { auth } from "../lib/firebase"
+import { auth, ensureUserDoc, googleProvider } from "../lib/firebase"
 import { Music, Mail, Lock, User, ArrowLeft } from "lucide-react"
 
 const AuthPage = () => {
@@ -20,35 +20,34 @@ const AuthPage = () => {
   const navigate = useNavigate()
 
   const handleEmailAuth = async (e) => {
-    e.preventDefault()
-    setLoading(true)
-
+    e.preventDefault();
+    setLoading(true);
     try {
-      if (isSignUp) {
-        await createUserWithEmailAndPassword(auth, email, password)
-      } else {
-        await signInWithEmailAndPassword(auth, email, password)
-      }
-      navigate("/dashboard")
-    } catch (error) {
-      console.error("Auth error:", error)
+      const cred = isSignUp
+        ? await createUserWithEmailAndPassword(auth, email, password)
+        : await signInWithEmailAndPassword(auth, email, password);
+  
+      await ensureUserDoc(cred.user);
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("Auth error:", err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
-
+  };
+  
   const handleGoogleAuth = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const provider = new GoogleAuthProvider()
-      await signInWithPopup(auth, provider)
-      navigate("/dashboard")
-    } catch (error) {
-      console.error("Google auth error:", error)
+      const { user } = await signInWithPopup(auth, googleProvider);
+      await ensureUserDoc(user);
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("Google auth error:", err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white flex items-center justify-center p-6">

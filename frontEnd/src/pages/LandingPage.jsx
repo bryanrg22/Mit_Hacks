@@ -75,15 +75,18 @@ const LandingPage = () => {
 
   useEffect(() => {
     const animateParticles = () => {
-      setParticles((prev) =>
-        prev.map((particle) => ({
-          ...particle,
-          x: particle.x + particle.speedX,
-          y: particle.y + particle.speedY,
-          x: particle.x > window.innerWidth ? 0 : particle.x < 0 ? window.innerWidth : particle.x,
-          y: particle.y > window.innerHeight ? 0 : particle.y < 0 ? window.innerHeight : particle.y,
-        })),
+      setParticles(prev =>
+        prev.map(p => {
+          let nx = p.x + p.speedX
+          let ny = p.y + p.speedY
+          if (nx > window.innerWidth) nx = 0
+          else if (nx < 0) nx = window.innerWidth
+          if (ny > window.innerHeight) ny = 0
+          else if (ny < 0) ny = window.innerHeight
+          return { ...p, x: nx, y: ny }
+        })
       )
+      
 
       setFlyingStars((prev) =>
         prev.map((star) => {
