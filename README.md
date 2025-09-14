@@ -1,6 +1,6 @@
 # Nosu - HackMIT 2025 
 
-HackMIT 2025 - "ONE LINER GOES HERE"
+HackMIT 2025 - Nosu - AI Soundtracks for Every Scene
 
 Turn any short video into a perfectly-timed soundtrack using computer vision + LLM prompting + generative music, then auto-merge into a shareable MP4.
 
