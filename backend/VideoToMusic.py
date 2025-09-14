@@ -3,7 +3,9 @@ from openai import OpenAI
 from dotenv import load_dotenv
 from DataFromVideo import DataFromVideo
 from SunoMusicGenerator import SunoMusicGenerator
-from moviepy.editor import VideoFileClip, AudioFileClip, afx
+from moviepy.video.io.VideoFileClip import VideoFileClip
+from moviepy.audio.io.AudioFileClip import AudioFileClip
+from moviepy.audio.fx import AudioLoop
 import time
 
 
@@ -39,7 +41,7 @@ def merge_music_and_video(video_path="", audio_path=""):
     background_audio = AudioFileClip(audio_path)
     # Loop or trim
     background_audio = (
-        afx.audio_loop(background_audio, duration=video_duration)
+        AudioLoop.audio_loop(background_audio, duration=video_duration)
         if background_audio.duration < video_duration
         else background_audio.subclip(0, video_duration)
     )
@@ -83,7 +85,7 @@ Output only the music prompt text, nothing else.
     key = os.environ.get("GPT_KEY")
     answer = prompt_gpt(instructions, user_input, key)
     print(answer)
-    video_prompt = f"{answer}, DO NOT MAKE MUSIC LONGER THAN 1 MINUTE."
+    video_prompt = answer
     tags = "background"
     suno = SunoMusicGenerator()
     clip_id = suno.prompt_suno(video_prompt, tags)

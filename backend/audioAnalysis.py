@@ -26,7 +26,7 @@ import sys
 import json
 import tempfile
 import csv
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Dict, Optional
 from datetime import datetime
 
 import numpy as np
@@ -52,9 +52,10 @@ DEFAULT_LABELS = [
 HYPOTHESIS = "The audio is {}."  # zero-shot template
 
 
-def extract_audio_16k_mono_to_temp(video_path: str) -> str:
+def extract_audio_16k_mono_to_temp(video_path: str) -> Optional[str]:
     """
     Extract audio from video to a temporary 16 kHz mono WAV and return its path.
+    Returns None if video has no audio track.
     """
     if not os.path.exists(video_path):
         raise FileNotFoundError(video_path)
@@ -62,26 +63,32 @@ def extract_audio_16k_mono_to_temp(video_path: str) -> str:
     clip = VideoFileClip(video_path)
     if clip.audio is None:
         clip.close()
-        raise RuntimeError("Video has no audio track.")
-
-    # 1) demux to temp wav (16k) via moviepy/ffmpeg
-    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as t1:
-        tmp_wav_rough = t1.name
-    clip.audio.write_audiofile(tmp_wav_rough, fps=SAMPLE_RATE)
-    clip.close()
-
-    # 2) ensure mono 16k (robust) via librosa + soundfile
-    y, sr = librosa.load(tmp_wav_rough, sr=SAMPLE_RATE, mono=True)
-    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as t2:
-        tmp_wav = t2.name
-    sf.write(tmp_wav, y.astype(np.float32), samplerate=SAMPLE_RATE)
+        print(f"[WARNING] Video has no audio track: {video_path}")
+        return None
 
     try:
-        os.remove(tmp_wav_rough)
-    except Exception:
-        pass
+        # 1) demux to temp wav (16k) via moviepy/ffmpeg
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as t1:
+            tmp_wav_rough = t1.name
+        clip.audio.write_audiofile(tmp_wav_rough, fps=SAMPLE_RATE)
+        clip.close()
 
-    return tmp_wav
+        # 2) ensure mono 16k (robust) via librosa + soundfile
+        y, sr = librosa.load(tmp_wav_rough, sr=SAMPLE_RATE, mono=True)
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as t2:
+            tmp_wav = t2.name
+        sf.write(tmp_wav, y.astype(np.float32), samplerate=SAMPLE_RATE)
+
+        try:
+            os.remove(tmp_wav_rough)
+        except Exception:
+            pass
+
+        return tmp_wav
+    except Exception as e:
+        clip.close()
+        print(f"[ERROR] Failed to extract audio: {e}")
+        return None
 
 
 def score_labels_windowed_with_clap(audio_path: str,
@@ -224,10 +231,15 @@ def analyze_audio_segments(audio_path: str, num_segments: int = 4) -> List[Dict]
     return segment_results
 
 
-def save_sentiment_data(segment_results: List[Dict], video_path: str):
+def save_sentiment_data(segment_results: List[Dict], video_path: str) -> Optional[str]:
     """
     Save sentiment analysis results with timestamps to CSV file in the audioData folder.
+    Returns None if no data to save.
     """
+    if not segment_results:
+        print("[WARNING] No audio analysis data to save")
+        return None
+        
     # Create audioData directory path
     audio_data_dir = os.path.join("test", "audioData")
     os.makedirs(audio_data_dir, exist_ok=True)
@@ -287,6 +299,11 @@ def main():
     try:
         # 1) Extract audio automatically
         tmp_audio = extract_audio_16k_mono_to_temp(video_path)
+        
+        if tmp_audio is None:
+            print(f"[INFO] No audio track found in video: {video_path}")
+            print("[INFO] Skipping audio analysis")
+            return
 
         # 2) Analyze audio in segments
         segment_results = analyze_audio_segments(tmp_audio, num_segments)
@@ -316,7 +333,14 @@ def main():
         print(f"\nSAVING SENTIMENT DATA...")
         print("=" * 30)
         csv_file = save_sentiment_data(segment_results, video_path)
-        print(f"Analysis complete! Data saved to: {csv_file}")
+        if csv_file:
+            print(f"Analysis complete! Data saved to: {csv_file}")
+        else:
+            print("No data saved (no audio found)")
+
+    except Exception as e:
+        print(f"[ERROR] Audio analysis failed: {e}")
+        return
 
     finally:
         if tmp_audio and os.path.exists(tmp_audio):

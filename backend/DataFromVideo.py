@@ -5,6 +5,7 @@ from PIL import Image
 from transformers import BlipProcessor, BlipForConditionalGeneration
 from transformers import VideoMAEImageProcessor, VideoMAEForVideoClassification
 import numpy as np
+import os
 
 
 class DataFromVideo:
@@ -28,6 +29,13 @@ class DataFromVideo:
         )
 
     def analyze_video(self, video_path, step=60, output_csv="frame_metadata.csv"):
+        # Create imageData directory path
+        image_data_dir = os.path.join("test", "imageData")
+        os.makedirs(image_data_dir, exist_ok=True)
+        
+        # Create full path for CSV file
+        csv_filepath = os.path.join(image_data_dir, output_csv)
+        
         cap = cv2.VideoCapture(video_path)
         fps = cap.get(cv2.CAP_PROP_FPS)
         frame_num = 0
@@ -61,8 +69,8 @@ class DataFromVideo:
 
         # Save all metadata to CSV
         df_results = pd.DataFrame(results_list)
-        df_results.to_csv(output_csv, index=False)
-        print(f"Saved metadata for {len(df_results)} detections → {output_csv}")
+        df_results.to_csv(csv_filepath, index=False)
+        print(f"Saved metadata for {len(df_results)} detections → {csv_filepath}")
         return results_list
 
     def detail_analyze_video(
@@ -81,6 +89,13 @@ class DataFromVideo:
             output_csv: CSV to save frame metadata
             human_in_loop: If True, prompt user to review/edit captions
         """
+        # Create imageData directory path
+        image_data_dir = os.path.join("test", "imageData")
+        os.makedirs(image_data_dir, exist_ok=True)
+        
+        # Create full path for CSV file
+        csv_filepath = os.path.join(image_data_dir, output_csv)
+        
         cap = cv2.VideoCapture(video_path)
         fps = cap.get(cv2.CAP_PROP_FPS)
         frame_num = 0
@@ -120,8 +135,8 @@ class DataFromVideo:
 
         cap.release()
         df_results = pd.DataFrame(results_list)
-        df_results.to_csv(output_csv, index=False)
-        print(f"Saved metadata for {len(results_list)} frames → {output_csv}")
+        df_results.to_csv(csv_filepath, index=False)
+        print(f"Saved metadata for {len(results_list)} frames → {csv_filepath}")
         return results_list
 
     def scene_understanding_timeline(
@@ -141,6 +156,13 @@ class DataFromVideo:
             num_frames: number of frames sampled per chunk
             output_csv: where to save results
         """
+        # Create imageData directory path
+        image_data_dir = os.path.join("test", "imageData")
+        os.makedirs(image_data_dir, exist_ok=True)
+        
+        # Create full path for CSV file
+        csv_filepath = os.path.join(image_data_dir, output_csv)
+        
         cap = cv2.VideoCapture(video_path)
         fps = cap.get(cv2.CAP_PROP_FPS)
         total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -169,10 +191,14 @@ class DataFromVideo:
                     outputs = self.videomae(**inputs)
                     logits = outputs.logits
                     predicted_class = logits.argmax(-1).item()
+                    
+                    # Calculate confidence score using softmax
+                    probabilities = torch.softmax(logits, dim=-1)
+                    confidence = probabilities[0][predicted_class].item()
 
                 label = self.videomae.config.id2label[predicted_class]
                 print(
-                    f"Chunk {chunk_start:.1f}s–{chunk_start+chunk_seconds:.1f}s → {label}"
+                    f"Chunk {chunk_start:.1f}s–{chunk_start+chunk_seconds:.1f}s → {label} (confidence: {confidence:.3f})"
                 )
 
                 results_list.append(
@@ -180,6 +206,7 @@ class DataFromVideo:
                         "start_sec": chunk_start,
                         "end_sec": min(chunk_start + chunk_seconds, video_duration),
                         "scene_label": label,
+                        "confidence": round(confidence, 3),
                     }
                 )
 
@@ -188,8 +215,8 @@ class DataFromVideo:
         cap.release()
 
         df_results = pd.DataFrame(results_list)
-        df_results.to_csv(output_csv, index=False)
-        print(f"Saved {len(results_list)} scene chunks → {output_csv}")
+        df_results.to_csv(csv_filepath, index=False)
+        print(f"Saved {len(results_list)} scene chunks → {csv_filepath}")
         return results_list
 
 
