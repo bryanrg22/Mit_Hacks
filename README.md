@@ -8,7 +8,9 @@ HackMIT 2025 - Nosu - AI Soundtracks for Every Scene
 
 Turn any short video into a perfectly-timed soundtrack using computer vision + LLM prompting + generative music, then auto-merge into a shareable MP4.
 
-What it does: analyzes the video (objects, captions, scene/action, audio sentiment analysis), crafts a concise music prompt using weights from the confidence of the descriptors for each time interval in the video, generates background music, and (optionally) mixes the track into the original clip (royalty & copyright free)—fully integrated with Firebase Auth, Firestore, and Storage.
+What it does: analyzes the video (objects, captions, scene/action, audio sentiment analysis), crafts a concise music prompt using weights from the confidence of the descriptors for each time interval in the video, generates background music, and (optionally) mixes the track into the original clip (royalty & copyright free). 
+
+Fully integrated with Firebase Auth, Firestore, and Storage.
 
 ## Video
 
