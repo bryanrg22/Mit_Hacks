@@ -26,8 +26,8 @@ Fully integrated with Firebase Auth, Firestore, and Storage.
 ### Backend
 
 - **Python + FastAPI** - API server
-- **MoviePy** - Audio/Video Muxing (H.264/AAC)
-- **Hugging Face Transformers** - BLIP, VideoMAE; YOLOv5 for objects
+- **MoviePy** - Audio Extraction/Video Mixing (H.264/AAC)
+- **Hugging Face Transformers** - BLIP, VideoMAE; YOLOv5, CLAP 
 - **OpenAI SDK** - Prompt Generation Helper
 - **Suno API** - Music Generation
 
