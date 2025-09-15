@@ -37,12 +37,6 @@ Fully integrated with Firebase Auth, Firestore, and Storage.
 - **Firebase Authentication** - User Management
 - **Firebase Storage** - File Storage
 
-### AI Integration
-
-- **Firebase Firestore** - NoSQL Database
-- **Firebase Authentication** - User Management
-- **Firebase Storage** - File Storage
-
 <div align="center">
   <img alt="banner" width="800" height="800" alt="Image" src="https://github.com/user-attachments/assets/2d8e0e5f-dca1-4055-a6c6-dec9ca796073" />
 </div>
