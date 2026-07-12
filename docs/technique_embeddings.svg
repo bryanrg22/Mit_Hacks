@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 950" font-family="'DM Sans', -apple-system, 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="ag" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#E8A838"/>
+    </marker>
+    <marker id="an" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#b0aaa0"/>
+    </marker>
+  </defs>
+
+  <!-- background -->
+  <rect x="8" y="8" width="1384" height="934" rx="26" fill="#242220"/>
+
+  <!-- ================= ROW 1 : input pipeline ================= -->
+  <!-- Uploaded video (amber input) -->
+  <rect x="170" y="52" width="250" height="124" rx="14" fill="#B8842C"/>
+  <text x="295" y="90" font-size="25" font-weight="bold" fill="#ffffff" text-anchor="middle">Uploaded video</text>
+  <text x="295" y="120" font-size="18" fill="#e6e0d6" text-anchor="middle">any .mp4 with audio</text>
+  <text x="295" y="144" font-size="18" fill="#e6e0d6" text-anchor="middle">speech or ambience</text>
+
+  <!-- Audio extraction (green processing) -->
+  <rect x="500" y="52" width="330" height="124" rx="14" fill="#0E9F7A"/>
+  <text x="665" y="90" font-size="25" font-weight="bold" fill="#ffffff" text-anchor="middle">Audio extraction</text>
+  <text x="665" y="120" font-size="18" fill="#e6e0d6" text-anchor="middle">moviepy + ffmpeg demux</text>
+  <text x="665" y="144" font-size="18" fill="#e6e0d6" text-anchor="middle">librosa &#8594; 16 kHz mono WAV</text>
+
+  <!-- Segments & windows (green processing) -->
+  <rect x="910" y="52" width="330" height="124" rx="14" fill="#0E9F7A"/>
+  <text x="1075" y="88" font-size="25" font-weight="bold" fill="#ffffff" text-anchor="middle">Segments &amp; windows</text>
+  <text x="1075" y="116" font-size="18" fill="#e6e0d6" text-anchor="middle">4 equal segments per video</text>
+  <text x="1075" y="140" font-size="18" fill="#e6e0d6" text-anchor="middle">RMS-norm &#8776; &#8722;20 dBFS</text>
+  <text x="1075" y="164" font-size="18" fill="#e6e0d6" text-anchor="middle">5.0 s windows &#183; 2.5 s hop</text>
+
+  <!-- row 1 arrows -->
+  <line x1="420" y1="114" x2="492" y2="114" stroke="#E8A838" stroke-width="3" marker-end="url(#ag)"/>
+  <line x1="830" y1="114" x2="902" y2="114" stroke="#E8A838" stroke-width="3" marker-end="url(#ag)"/>
+
+  <!-- windows down to audio encoder -->
+  <line x1="1075" y1="176" x2="1075" y2="230" stroke="#E8A838" stroke-width="3" marker-end="url(#ag)"/>
+  <text x="1092" y="209" font-size="17" fill="#cfc9bf">audio windows</text>
+
+  <!-- ================= ROW 2 : label set + the two CLAP towers ================= -->
+  <!-- Mood label set (amber input) -->
+  <rect x="90" y="238" width="360" height="138" rx="14" fill="#B8842C"/>
+  <text x="270" y="278" font-size="25" font-weight="bold" fill="#ffffff" text-anchor="middle">Mood label set (15)</text>
+  <text x="270" y="310" font-size="18" fill="#e6e0d6" text-anchor="middle">&#8220;calm&#8221; &#183; &#8220;energetic&#8221; &#183; &#8220;tense&#8221;</text>
+  <text x="270" y="336" font-size="18" fill="#e6e0d6" text-anchor="middle">&#8220;joyful&#8221; &#183; &#8220;melancholic&#8221; &#8230;</text>
+  <text x="270" y="362" font-size="18" fill="#e6e0d6" text-anchor="middle">template: &#8220;The audio is {}.&#8221;</text>
+
+  <!-- CLAP text encoder (purple model) -->
+  <rect x="520" y="238" width="330" height="138" rx="14" fill="#6D5BD8"/>
+  <text x="685" y="278" font-size="25" font-weight="bold" fill="#ffffff" text-anchor="middle">CLAP text encoder</text>
+  <text x="685" y="310" font-size="18" fill="#e6e0d6" text-anchor="middle">laion/clap-htsat-unfused</text>
+  <text x="685" y="336" font-size="18" fill="#e6e0d6" text-anchor="middle">text transformer tower</text>
+  <text x="685" y="362" font-size="18" fill="#e6e0d6" text-anchor="middle">512-d vector per label</text>
+
+  <!-- CLAP audio encoder (purple model) -->
+  <rect x="910" y="238" width="330" height="138" rx="14" fill="#6D5BD8"/>
+  <text x="1075" y="278" font-size="25" font-weight="bold" fill="#ffffff" text-anchor="middle">CLAP audio encoder</text>
+  <text x="1075" y="310" font-size="18" fill="#e6e0d6" text-anchor="middle">laion/clap-htsat-unfused</text>
+  <text x="1075" y="336" font-size="18" fill="#e6e0d6" text-anchor="middle">HTSAT audio transformer</text>
+  <text x="1075" y="362" font-size="18" fill="#e6e0d6" text-anchor="middle">512-d vector per window</text>
+
+  <!-- labels into text encoder -->
+  <line x1="450" y1="307" x2="512" y2="307" stroke="#E8A838" stroke-width="3" marker-end="url(#ag)"/>
+  <text x="481" y="294" font-size="17" fill="#cfc9bf" text-anchor="middle">&#215;15</text>
+
+  <!-- encoders into shared space -->
+  <line x1="685" y1="376" x2="685" y2="406" stroke="#b0aaa0" stroke-width="2.5" marker-end="url(#an)"/>
+  <line x1="1075" y1="376" x2="1075" y2="406" stroke="#b0aaa0" stroke-width="2.5" marker-end="url(#an)"/>
+
+  <!-- ================= SHARED EMBEDDING SPACE ================= -->
+  <rect x="490" y="410" width="780" height="172" rx="14" fill="none" stroke="#6D5BD8" stroke-width="2" stroke-dasharray="8 6"/>
+  <text x="510" y="436" font-size="17" font-style="italic" fill="#cfc9bf">shared 512-d audio&#8211;text embedding space</text>
+  <text x="1250" y="436" font-size="15" font-style="italic" fill="#8a8078" text-anchor="end">(cell values illustrative)</text>
+
+  <!-- label embedding mini-vectors -->
+  <g font-size="13" fill="#e6e0d6" text-anchor="middle">
+    <!-- calm -->
+    <rect x="575" y="450" width="56" height="20" rx="4" fill="#2e2a26" stroke="#6D5BD8"/>
+    <rect x="575" y="473" width="56" height="20" rx="4" fill="#2e2a26" stroke="#6D5BD8"/>
+    <rect x="575" y="496" width="56" height="20" rx="4" fill="#2e2a26" stroke="#6D5BD8"/>
+    <text x="603" y="465">0.21</text><text x="603" y="488">&#8722;0.65</text><text x="603" y="511">&#8230;</text>
+    <text x="603" y="540" font-size="14" fill="#cfc9bf">&#8220;calm&#8221;</text>
+    <!-- tense -->
+    <rect x="655" y="450" width="56" height="20" rx="4" fill="#2e2a26" stroke="#6D5BD8"/>
+    <rect x="655" y="473" width="56" height="20" rx="4" fill="#2e2a26" stroke="#6D5BD8"/>
+    <rect x="655" y="496" width="56" height="20" rx="4" fill="#2e2a26" stroke="#6D5BD8"/>
+    <text x="683" y="465">&#8722;0.33</text><text x="683" y="488">0.77</text><text x="683" y="511">&#8230;</text>
+    <text x="683" y="540" font-size="14" fill="#cfc9bf">&#8220;tense&#8221;</text>
+    <!-- joyful -->
+    <rect x="735" y="450" width="56" height="20" rx="4" fill="#2e2a26" stroke="#6D5BD8"/>
+    <rect x="735" y="473" width="56" height="20" rx="4" fill="#2e2a26" stroke="#6D5BD8"/>
+    <rect x="735" y="496" width="56" height="20" rx="4" fill="#2e2a26" stroke="#6D5BD8"/>
+    <text x="763" y="465">0.05</text><text x="763" y="488">0.91</text><text x="763" y="511">&#8230;</text>
+    <text x="763" y="540" font-size="14" fill="#cfc9bf">&#8220;joyful&#8221;</text>
+    <text x="822" y="490" font-size="20" fill="#cfc9bf">&#8230;</text>
+  </g>
+
+  <!-- window embedding vector -->
+  <g font-size="13" fill="#e6e0d6" text-anchor="middle">
+    <rect x="1040" y="450" width="64" height="20" rx="4" fill="#2e2a26" stroke="#6D5BD8"/>
+    <rect x="1040" y="473" width="64" height="20" rx="4" fill="#2e2a26" stroke="#6D5BD8"/>
+    <rect x="1040" y="496" width="64" height="20" rx="4" fill="#2e2a26" stroke="#6D5BD8"/>
+    <text x="1072" y="465">0.12</text><text x="1072" y="488">&#8722;0.87</text><text x="1072" y="511">&#8230;</text>
+    <text x="1072" y="540" font-size="14" fill="#cfc9bf">one 5 s window</text>
+  </g>
+
+  <!-- vectors into scoring -->
+  <line x1="670" y1="582" x2="628" y2="630" stroke="#E8A838" stroke-width="3" marker-end="url(#ag)"/>
+  <text x="600" y="612" font-size="17" fill="#cfc9bf" text-anchor="end">15 label vectors</text>
+  <line x1="1072" y1="582" x2="806" y2="630" stroke="#E8A838" stroke-width="3" marker-end="url(#ag)"/>
+  <text x="985" y="618" font-size="17" fill="#cfc9bf">window vector</text>
+
+  <!-- ================= ROW 3 : zero-shot scoring ================= -->
+  <rect x="490" y="636" width="420" height="138" rx="14" fill="#0E9F7A"/>
+  <text x="700" y="676" font-size="25" font-weight="bold" fill="#ffffff" text-anchor="middle">Zero-shot mood scoring</text>
+  <text x="700" y="708" font-size="18" fill="#e6e0d6" text-anchor="middle">HF zero-shot-audio pipeline</text>
+  <text x="700" y="734" font-size="18" fill="#e6e0d6" text-anchor="middle">cosine sim: window &#8596; each label</text>
+  <text x="700" y="760" font-size="18" fill="#e6e0d6" text-anchor="middle">softmax &#183; median over windows</text>
+
+  <!-- punchline callout -->
+  <rect x="70" y="650" width="380" height="200" rx="14" fill="none" stroke="#E8A838" stroke-width="2" stroke-dasharray="8 6"/>
+  <text x="90" y="688" font-size="22" font-weight="bold" fill="#E8A838">ZERO-SHOT</text>
+  <text x="90" y="720" font-size="18" fill="#e6e0d6">No task-specific training.</text>
+  <text x="90" y="747" font-size="18" fill="#e6e0d6">Adding a mood costs one more</text>
+  <text x="90" y="774" font-size="18" fill="#e6e0d6">text embedding. Classification</text>
+  <text x="90" y="801" font-size="18" fill="#e6e0d6">is geometry &#8212; nearest labels</text>
+  <text x="90" y="828" font-size="18" fill="#e6e0d6">in a shared audio&#8211;text space.</text>
+  <line x1="450" y1="712" x2="486" y2="704" stroke="#E8A838" stroke-width="2" stroke-dasharray="5 5"/>
+
+  <!-- scoring to timeline -->
+  <line x1="700" y1="774" x2="684" y2="814" stroke="#E8A838" stroke-width="3" marker-end="url(#ag)"/>
+  <text x="716" y="800" font-size="17" fill="#cfc9bf">mood scores</text>
+
+  <!-- ================= ROW 4 : timeline + GPT composer ================= -->
+  <rect x="490" y="820" width="380" height="104" rx="14" fill="#B8842C"/>
+  <text x="680" y="858" font-size="25" font-weight="bold" fill="#ffffff" text-anchor="middle">Mood timeline (4 seg.)</text>
+  <text x="680" y="888" font-size="18" fill="#e6e0d6" text-anchor="middle">top-2 moods + score per segment</text>
+  <text x="680" y="912" font-size="18" fill="#e6e0d6" text-anchor="middle">e.g. angry 0.52 &#8594; relaxing 0.40</text>
+
+  <line x1="870" y1="872" x2="942" y2="872" stroke="#E8A838" stroke-width="3" marker-end="url(#ag)"/>
+
+  <rect x="950" y="820" width="380" height="104" rx="14" fill="#B34A3E"/>
+  <text x="1140" y="858" font-size="25" font-weight="bold" fill="#ffffff" text-anchor="middle">GPT prompt composer</text>
+  <text x="1140" y="888" font-size="18" fill="#e6e0d6" text-anchor="middle">OpenAI gpt-3.5-turbo</text>
+  <text x="1140" y="912" font-size="18" fill="#e6e0d6" text-anchor="middle">moods + scenes &#8594; Suno prompt</text>
+</svg>
