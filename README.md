@@ -20,6 +20,10 @@
 
 ---
 
+## System Architecture
+
+<img src="docs/architecture.svg" alt="System architecture diagram" width="900"/>
+
 ## What is Nosu?
 
 **Nosu** turns any short video into a perfectly-timed, royalty-free AI soundtrack — then merges it back into a shareable MP4. No music theory. No licensing headaches. Just upload and go.
