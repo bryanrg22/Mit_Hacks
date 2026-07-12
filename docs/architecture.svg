@@ -1,0 +1,168 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 950" font-family="'DM Sans', -apple-system, 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="ag" markerWidth="7" markerHeight="7" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+      <path d="M0,0 L10,5 L0,10 z" fill="#E8A838"/>
+    </marker>
+    <marker id="ai" markerWidth="7" markerHeight="7" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+      <path d="M0,0 L10,5 L0,10 z" fill="#b0aaa0"/>
+    </marker>
+    <marker id="ad" markerWidth="7" markerHeight="7" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse" viewBox="0 0 10 10">
+      <path d="M0,0 L10,5 L0,10 z" fill="#9a948a"/>
+    </marker>
+  </defs>
+
+  <!-- background panel -->
+  <rect x="8" y="8" width="1384" height="934" rx="26" fill="#242220"/>
+
+  <!-- ================= GROUP CONTAINERS ================= -->
+  <!-- Browser -->
+  <rect x="40" y="60" width="450" height="224" rx="20" fill="#2e2b28" stroke="#4a463f" stroke-width="2"/>
+  <text x="64" y="96" font-size="24" font-weight="bold" fill="#c9c3b8">Browser</text>
+
+  <!-- Firebase Cloud -->
+  <rect x="610" y="54" width="750" height="330" rx="20" fill="#2e2b28" stroke="#4a463f" stroke-width="2"/>
+  <text x="634" y="90" font-size="24" font-weight="bold" fill="#c9c3b8">Firebase Cloud</text>
+
+  <!-- Backend (GPU machine) -->
+  <rect x="40" y="424" width="900" height="480" rx="20" fill="#2e2b28" stroke="#4a463f" stroke-width="2"/>
+  <text x="64" y="460" font-size="24" font-weight="bold" fill="#c9c3b8">Backend (GPU machine)</text>
+
+  <!-- External APIs -->
+  <rect x="1048" y="424" width="312" height="336" rx="20" fill="#2e2b28" stroke="#4a463f" stroke-width="2"/>
+  <text x="1072" y="460" font-size="24" font-weight="bold" fill="#c9c3b8">External APIs</text>
+
+  <!-- ================= ARROWS ================= -->
+  <!-- SPA -> Firebase Auth (over the top) -->
+  <polyline points="350,130 350,34 1175,34 1175,101" fill="none" stroke="#E8A838" stroke-width="3" marker-end="url(#ag)"/>
+  <text x="762" y="26" font-size="17" fill="#cfc9bf" text-anchor="middle">Google OAuth / anonymous sign-in</text>
+
+  <!-- SPA -> Firestore -->
+  <line x1="470" y1="150" x2="626" y2="150" stroke="#E8A838" stroke-width="3" marker-end="url(#ag)"/>
+  <text x="540" y="136" font-size="17" fill="#cfc9bf" text-anchor="middle">setDoc job doc</text>
+
+  <!-- Firestore -> SPA (async onSnapshot) -->
+  <line x1="630" y1="192" x2="475" y2="192" stroke="#9a948a" stroke-width="2.5" stroke-dasharray="7 7" marker-end="url(#ad)"/>
+  <text x="540" y="178" font-size="17" fill="#cfc9bf" text-anchor="middle">onSnapshot ready</text>
+
+  <!-- SPA -> Storage -->
+  <line x1="470" y1="228" x2="625" y2="264" stroke="#E8A838" stroke-width="3" marker-end="url(#ag)"/>
+  <text x="540" y="214" font-size="17" fill="#cfc9bf" text-anchor="middle">resumable upload</text>
+
+  <!-- Storage -> SPA -->
+  <line x1="630" y1="325" x2="475" y2="247" stroke="#E8A838" stroke-width="3" marker-end="url(#ag)"/>
+  <text x="545" y="342" font-size="17" fill="#cfc9bf" text-anchor="middle">getDownloadURL</text>
+
+  <!-- SPA -> FastAPI -->
+  <line x1="240" y1="248" x2="637" y2="475" stroke="#E8A838" stroke-width="3" marker-end="url(#ag)"/>
+  <text x="170" y="350" font-size="17" fill="#cfc9bf">POST /api/process</text>
+  <text x="170" y="372" font-size="17" fill="#cfc9bf">{uid, genId, paths}</text>
+
+  <!-- FastAPI -> Vision (internal) -->
+  <line x1="560" y1="512" x2="455" y2="512" stroke="#b0aaa0" stroke-width="2.5" marker-end="url(#ai)"/>
+  <text x="505" y="498" font-size="17" fill="#cfc9bf" text-anchor="middle">video frames</text>
+  <text x="505" y="540" font-size="17" fill="#cfc9bf" text-anchor="middle">→ CSVs</text>
+
+  <!-- FastAPI -> Audio (internal) -->
+  <line x1="600" y1="596" x2="425" y2="618" stroke="#b0aaa0" stroke-width="2.5" marker-end="url(#ai)"/>
+  <text x="275" y="612" font-size="17" fill="#cfc9bf">extract 16kHz WAV</text>
+
+  <!-- FastAPI -> OpenAI -->
+  <line x1="920" y1="525" x2="1059" y2="525" stroke="#E8A838" stroke-width="3" marker-end="url(#ag)"/>
+  <text x="992" y="505" font-size="17" fill="#cfc9bf" text-anchor="middle">CSVs →</text>
+  <text x="992" y="551" font-size="17" fill="#cfc9bf" text-anchor="middle">music prompt</text>
+
+  <!-- Suno client -> Suno API (async polling) -->
+  <line x1="920" y1="678" x2="1059" y2="678" stroke="#9a948a" stroke-width="2.5" stroke-dasharray="7 7" marker-end="url(#ad)"/>
+  <text x="992" y="658" font-size="17" fill="#cfc9bf" text-anchor="middle">POST /generate</text>
+  <text x="992" y="704" font-size="17" fill="#cfc9bf" text-anchor="middle">polls /clips 3s</text>
+
+  <!-- Suno client -> VideoToMusic (internal) -->
+  <line x1="630" y1="740" x2="630" y2="761" stroke="#b0aaa0" stroke-width="2.5" marker-end="url(#ai)"/>
+  <text x="690" y="759" font-size="17" fill="#cfc9bf">downloads {clip_id}.mp3</text>
+
+  <!-- ================= COMPONENT BOXES ================= -->
+  <!-- React SPA (entry / amber) -->
+  <rect x="60" y="130" width="410" height="118" rx="14" fill="#B8842C"/>
+  <text x="78" y="162" font-size="25" font-weight="bold" fill="#ffffff">React SPA (Vite)</text>
+  <text x="78" y="190" font-size="18" fill="#e6e0d6">React 18 + react-router v6</text>
+  <text x="78" y="213" font-size="18" fill="#e6e0d6">/auth /upload /generate /dashboard</text>
+  <text x="78" y="236" font-size="18" fill="#e6e0d6">onSnapshot flips UI on ready flags</text>
+
+  <!-- Cloud Firestore (infra / purple) -->
+  <rect x="630" y="104" width="354" height="118" rx="14" fill="#6D5BD8"/>
+  <text x="648" y="136" font-size="25" font-weight="bold" fill="#ffffff">Cloud Firestore</text>
+  <text x="648" y="164" font-size="18" fill="#e6e0d6">users/{uid}/generations/{genId}</text>
+  <text x="648" y="187" font-size="18" fill="#e6e0d6">status + ready flags per asset</text>
+  <text x="648" y="210" font-size="18" fill="#e6e0d6">orderBy(updatedAt, desc)</text>
+
+  <!-- Firebase Auth (infra / purple) -->
+  <rect x="1010" y="104" width="330" height="118" rx="14" fill="#6D5BD8"/>
+  <text x="1028" y="136" font-size="25" font-weight="bold" fill="#ffffff">Firebase Auth</text>
+  <text x="1028" y="164" font-size="18" fill="#e6e0d6">Google OAuth + email</text>
+  <text x="1028" y="187" font-size="18" fill="#e6e0d6">signInAnonymously fallback</text>
+  <text x="1028" y="210" font-size="18" fill="#e6e0d6">seeds users/{uid} stats doc</text>
+
+  <!-- Firebase Storage (infra / purple) -->
+  <rect x="630" y="248" width="354" height="118" rx="14" fill="#6D5BD8"/>
+  <text x="648" y="280" font-size="25" font-weight="bold" fill="#ffffff">Firebase Storage</text>
+  <text x="648" y="308" font-size="18" fill="#e6e0d6">input.&lt;ext&gt;, track.mp3, ai.mp4</text>
+  <text x="648" y="331" font-size="18" fill="#e6e0d6">uploadBytesResumable 0–99%</text>
+  <text x="648" y="354" font-size="18" fill="#e6e0d6">getDownloadURL for playback</text>
+
+  <!-- Vision pipeline (app / green) -->
+  <rect x="70" y="478" width="380" height="118" rx="14" fill="#0E9F7A"/>
+  <text x="88" y="510" font-size="25" font-weight="bold" fill="#ffffff">Vision (DataFromVideo.py)</text>
+  <text x="88" y="538" font-size="18" fill="#e6e0d6">YOLOv5s, every 120th frame</text>
+  <text x="88" y="561" font-size="18" fill="#e6e0d6">BLIP image-captioning-base</text>
+  <text x="88" y="584" font-size="18" fill="#e6e0d6">VideoMAE Kinetics, 5s chunks</text>
+
+  <!-- FastAPI server (app / green) -->
+  <rect x="560" y="478" width="360" height="118" rx="14" fill="#0E9F7A"/>
+  <text x="578" y="510" font-size="25" font-weight="bold" fill="#ffffff">FastAPI (main.py)</text>
+  <text x="578" y="538" font-size="18" fill="#e6e0d6">uvicorn :8000, /video-to-music/</text>
+  <text x="578" y="561" font-size="18" fill="#e6e0d6">vision → audio → GPT → Suno</text>
+  <text x="578" y="584" font-size="18" fill="#e6e0d6">(/api/process not yet wired)</text>
+
+  <!-- Audio mood (app / green) -->
+  <rect x="70" y="622" width="380" height="118" rx="14" fill="#0E9F7A"/>
+  <text x="88" y="654" font-size="25" font-weight="bold" fill="#ffffff">Audio (audioAnalysis.py)</text>
+  <text x="88" y="682" font-size="18" fill="#e6e0d6">CLAP laion/clap-htsat-unfused</text>
+  <text x="88" y="705" font-size="18" fill="#e6e0d6">15 mood labels, zero-shot</text>
+  <text x="88" y="728" font-size="18" fill="#e6e0d6">5s window / 2.5s hop, 4 segments</text>
+
+  <!-- Suno client (app / green) -->
+  <rect x="560" y="622" width="360" height="118" rx="14" fill="#0E9F7A"/>
+  <text x="578" y="654" font-size="25" font-weight="bold" fill="#ffffff">SunoMusicGenerator.py</text>
+  <text x="578" y="682" font-size="18" fill="#e6e0d6">POST /generate, instrumental</text>
+  <text x="578" y="705" font-size="18" fill="#e6e0d6">polls /clips every 3s (180s)</text>
+  <text x="578" y="728" font-size="18" fill="#e6e0d6">streams {clip_id}.mp3 (8KB)</text>
+
+  <!-- Prompt + mux (app / green) -->
+  <rect x="315" y="766" width="360" height="118" rx="14" fill="#0E9F7A"/>
+  <text x="333" y="798" font-size="25" font-weight="bold" fill="#ffffff">VideoToMusic.py</text>
+  <text x="333" y="826" font-size="18" fill="#e6e0d6">gpt-3.5-turbo composer prompt</text>
+  <text x="333" y="849" font-size="18" fill="#e6e0d6">emphasize &gt;0.7, soften &lt;0.3</text>
+  <text x="333" y="872" font-size="18" fill="#e6e0d6">MoviePy → output_video.mp4</text>
+
+  <!-- OpenAI API (external / red) -->
+  <rect x="1064" y="478" width="280" height="118" rx="14" fill="#B34A3E"/>
+  <text x="1082" y="510" font-size="25" font-weight="bold" fill="#ffffff">OpenAI API</text>
+  <text x="1082" y="538" font-size="18" fill="#e6e0d6">client.responses.create</text>
+  <text x="1082" y="561" font-size="18" fill="#e6e0d6">model gpt-3.5-turbo</text>
+  <text x="1082" y="584" font-size="18" fill="#e6e0d6">GPT_KEY in .env.local</text>
+
+  <!-- Suno HackMIT API (external / red) -->
+  <rect x="1064" y="622" width="280" height="118" rx="14" fill="#B34A3E"/>
+  <text x="1082" y="654" font-size="25" font-weight="bold" fill="#ffffff">Suno HackMIT API</text>
+  <text x="1082" y="682" font-size="18" fill="#e6e0d6">studio-api.prod.suno.com</text>
+  <text x="1082" y="705" font-size="18" fill="#e6e0d6">/api/v2/external/hackmit</text>
+  <text x="1082" y="728" font-size="18" fill="#e6e0d6">Bearer SUNO_API_KEY</text>
+
+  <!-- ================= LEGEND ================= -->
+  <line x1="70" y1="924" x2="130" y2="924" stroke="#E8A838" stroke-width="3" marker-end="url(#ag)"/>
+  <text x="144" y="930" font-size="17" fill="#cfc9bf">primary user flow</text>
+  <line x1="380" y1="924" x2="440" y2="924" stroke="#b0aaa0" stroke-width="2.5" marker-end="url(#ai)"/>
+  <text x="454" y="930" font-size="17" fill="#cfc9bf">internal data</text>
+  <line x1="650" y1="924" x2="710" y2="924" stroke="#9a948a" stroke-width="2.5" stroke-dasharray="7 7" marker-end="url(#ad)"/>
+  <text x="724" y="930" font-size="17" fill="#cfc9bf">async / polling</text>
+</svg>
