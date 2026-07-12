@@ -1,0 +1,161 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 950" font-family="'DM Sans', -apple-system, 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <marker id="mA" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="10" refX="9" refY="4" orient="auto"><path d="M0 0L10 4L0 8Z" fill="#E8A838"/></marker>
+    <marker id="mG" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="10" refX="9" refY="4" orient="auto"><path d="M0 0L10 4L0 8Z" fill="#b0aaa0"/></marker>
+    <marker id="mD" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="10" refX="9" refY="4" orient="auto"><path d="M0 0L10 4L0 8Z" fill="#9a948a"/></marker>
+  </defs>
+
+  <rect x="8" y="8" width="1384" height="934" rx="26" fill="#242220"/>
+
+  <!-- input chip -->
+  <rect x="70" y="26" width="330" height="64" rx="14" fill="#B8842C"/>
+  <text x="90" y="54" font-size="25" font-weight="bold" fill="#ffffff">beach_audio.mp4</text>
+  <text x="90" y="80" font-size="18" fill="#f3ead9">23.45 s &#183; 30 fps test clip</text>
+  <text x="430" y="62" font-size="17" fill="#cfc9bf">one committed beach test clip &#183; three model streams share one clock</text>
+
+  <!-- shared time axis -->
+  <line x1="90" y1="126" x2="1230" y2="126" stroke="#4a463f" stroke-width="2"/>
+  <line x1="90" y1="120" x2="90" y2="132" stroke="#4a463f" stroke-width="2"/>
+  <line x1="333" y1="120" x2="333" y2="132" stroke="#4a463f" stroke-width="2"/>
+  <line x1="576" y1="120" x2="576" y2="132" stroke="#4a463f" stroke-width="2"/>
+  <line x1="819" y1="120" x2="819" y2="132" stroke="#4a463f" stroke-width="2"/>
+  <line x1="1062" y1="120" x2="1062" y2="132" stroke="#4a463f" stroke-width="2"/>
+  <line x1="1230" y1="120" x2="1230" y2="132" stroke="#4a463f" stroke-width="2"/>
+  <text x="90" y="112" font-size="17" fill="#cfc9bf" text-anchor="middle">0 s</text>
+  <text x="333" y="112" font-size="17" fill="#cfc9bf" text-anchor="middle">5 s</text>
+  <text x="576" y="112" font-size="17" fill="#cfc9bf" text-anchor="middle">10 s</text>
+  <text x="819" y="112" font-size="17" fill="#cfc9bf" text-anchor="middle">15 s</text>
+  <text x="1062" y="112" font-size="17" fill="#cfc9bf" text-anchor="middle">20 s</text>
+  <text x="1230" y="112" font-size="17" fill="#cfc9bf" text-anchor="end">23.45 s</text>
+
+  <!-- LANE 1 : YOLO + BLIP -->
+  <rect x="32" y="140" width="1218" height="180" rx="20" fill="#2e2b28" stroke="#4a463f" stroke-width="2"/>
+  <circle cx="62" cy="161" r="13" fill="#E8A838"/>
+  <text x="62" y="167" font-size="16" font-weight="bold" fill="#242220" text-anchor="middle">1</text>
+  <text x="84" y="168" font-size="24" font-weight="bold" fill="#c9c3b8">YOLOv5s + BLIP captioning &#8212; every 120th frame (1 frame / 4 s at 30 fps)</text>
+  <line x1="90" y1="225" x2="1230" y2="225" stroke="#3a3733" stroke-width="2"/>
+  <text x="90" y="205" font-size="15" fill="#8a847a" text-anchor="middle">f0</text>
+  <text x="284" y="205" font-size="15" fill="#8a847a" text-anchor="middle">f120</text>
+  <text x="479" y="205" font-size="15" fill="#8a847a" text-anchor="middle">f240</text>
+  <text x="673" y="205" font-size="15" fill="#8a847a" text-anchor="middle">f360</text>
+  <text x="868" y="205" font-size="15" fill="#8a847a" text-anchor="middle">f480</text>
+  <text x="1062" y="205" font-size="15" fill="#8a847a" text-anchor="middle">f600</text>
+  <path d="M90 215l8 10-8 10-8-10Z" fill="#E8A838"/>
+  <path d="M284 215l8 10-8 10-8-10Z" fill="#E8A838"/>
+  <path d="M479 215l8 10-8 10-8-10Z" fill="#E8A838"/>
+  <path d="M673 215l8 10-8 10-8-10Z" fill="#E8A838"/>
+  <path d="M868 215l8 10-8 10-8-10Z" fill="#E8A838"/>
+  <path d="M1062 215l8 10-8 10-8-10Z" fill="#E8A838"/>
+  <text x="90" y="262" font-size="15" fill="#8a847a">BLIP:</text>
+  <text x="284" y="262" font-size="16" fill="#e6e0d6" text-anchor="middle">&#8220;a sunset on the beach&#8221;</text>
+  <text x="673" y="262" font-size="16" fill="#e6e0d6" text-anchor="middle">&#8220;a view of the ocean from a boat&#8221;</text>
+  <text x="1062" y="262" font-size="16" fill="#e6e0d6" text-anchor="middle">&#8220;a beach with rocks and waves at sunset&#8221;</text>
+  <text x="90" y="292" font-size="15" fill="#8a847a">YOLO: 0 objects f0&#8211;f360</text>
+  <text x="868" y="292" font-size="16" fill="#e6e0d6" text-anchor="middle">4 &#215; &#8220;cow&#8221;</text>
+  <text x="1062" y="292" font-size="16" fill="#e6e0d6" text-anchor="middle">3 &#215; &#8220;cow&#8221;</text>
+  <text x="1230" y="310" font-size="15" fill="#8a847a" text-anchor="end">&#8594; frame_metadata.csv &#183; detail_frame_metadata.csv</text>
+
+  <!-- LANE 2 : VideoMAE -->
+  <rect x="32" y="346" width="1218" height="140" rx="20" fill="#2e2b28" stroke="#4a463f" stroke-width="2"/>
+  <circle cx="62" cy="367" r="13" fill="#E8A838"/>
+  <text x="62" y="373" font-size="16" font-weight="bold" fill="#242220" text-anchor="middle">2</text>
+  <text x="84" y="374" font-size="24" font-weight="bold" fill="#c9c3b8">VideoMAE (Kinetics) &#8212; 16 frames per 5 s chunk &#183; softmax confidence</text>
+  <rect x="91.5" y="396" width="240" height="50" rx="6" fill="#E8A838" fill-opacity="0.41"/>
+  <rect x="334.5" y="396" width="240" height="50" rx="6" fill="#E8A838" fill-opacity="0.32"/>
+  <rect x="577.5" y="396" width="240" height="50" rx="6" fill="#E8A838" fill-opacity="0.41"/>
+  <rect x="820.5" y="396" width="240" height="50" rx="6" fill="#E8A838" fill-opacity="0.39"/>
+  <rect x="1063.5" y="396" width="141" height="50" rx="6" fill="#E8A838" fill-opacity="0.37"/>
+  <text x="211" y="417" font-size="18" font-weight="bold" fill="#ffffff" text-anchor="middle">surfing water</text>
+  <text x="211" y="438" font-size="15" fill="#e6e0d6" text-anchor="middle">0.353</text>
+  <text x="455" y="417" font-size="18" font-weight="bold" fill="#ffffff" text-anchor="middle">kitesurfing</text>
+  <text x="455" y="438" font-size="15" fill="#e6e0d6" text-anchor="middle">0.187</text>
+  <text x="698" y="417" font-size="18" font-weight="bold" fill="#ffffff" text-anchor="middle">jetskiing</text>
+  <text x="698" y="438" font-size="15" fill="#e6e0d6" text-anchor="middle">0.350</text>
+  <text x="941" y="417" font-size="18" font-weight="bold" fill="#ffffff" text-anchor="middle">surfing water</text>
+  <text x="941" y="438" font-size="15" fill="#e6e0d6" text-anchor="middle">0.301</text>
+  <text x="1134" y="417" font-size="18" font-weight="bold" fill="#ffffff" text-anchor="middle">surfing water</text>
+  <text x="1134" y="438" font-size="15" fill="#e6e0d6" text-anchor="middle">0.265</text>
+  <text x="90" y="474" font-size="15" fill="#8a847a">bar opacity &#8733; confidence</text>
+  <text x="1230" y="474" font-size="15" fill="#8a847a" text-anchor="end">video ends 22.97 s &#8594; scene_timeline.csv</text>
+
+  <!-- LANE 3 : CLAP -->
+  <rect x="32" y="512" width="1218" height="140" rx="20" fill="#2e2b28" stroke="#4a463f" stroke-width="2"/>
+  <circle cx="62" cy="533" r="13" fill="#E8A838"/>
+  <text x="62" y="539" font-size="16" font-weight="bold" fill="#242220" text-anchor="middle">3</text>
+  <text x="84" y="540" font-size="24" font-weight="bold" fill="#c9c3b8">CLAP zero-shot audio mood &#8212; 15 labels &#183; 4 segments &#183; median-aggregated</text>
+  <rect x="90" y="550" width="243" height="9" fill="none" stroke="#9a948a" stroke-width="1.5"/>
+  <rect x="211.6" y="556" width="243" height="9" fill="none" stroke="#9a948a" stroke-width="1.5"/>
+  <rect x="333.2" y="550" width="243" height="9" fill="none" stroke="#9a948a" stroke-width="1.5"/>
+  <text x="600" y="562" font-size="16" fill="#cfc9bf">5 s windows &#183; 2.5 s hop &#8594; median score per label</text>
+  <rect x="91.5" y="572" width="282" height="48" rx="6" fill="#E8A838" fill-opacity="0.51"/>
+  <rect x="376.4" y="572" width="282" height="48" rx="6" fill="#E8A838" fill-opacity="0.39"/>
+  <rect x="661.3" y="572" width="282" height="48" rx="6" fill="#E8A838" fill-opacity="0.42"/>
+  <rect x="946.6" y="572" width="282" height="48" rx="6" fill="#E8A838" fill-opacity="0.44"/>
+  <text x="232" y="592" font-size="18" font-weight="bold" fill="#ffffff" text-anchor="middle">angry</text>
+  <text x="232" y="612" font-size="15" fill="#e6e0d6" text-anchor="middle">0.523</text>
+  <text x="517" y="592" font-size="18" font-weight="bold" fill="#ffffff" text-anchor="middle">angry</text>
+  <text x="517" y="612" font-size="15" fill="#e6e0d6" text-anchor="middle">0.303</text>
+  <text x="802" y="592" font-size="18" font-weight="bold" fill="#ffffff" text-anchor="middle">relaxing</text>
+  <text x="802" y="612" font-size="15" fill="#e6e0d6" text-anchor="middle">0.354</text>
+  <text x="1087" y="592" font-size="18" font-weight="bold" fill="#ffffff" text-anchor="middle">relaxing</text>
+  <text x="1087" y="612" font-size="15" fill="#e6e0d6" text-anchor="middle">0.402</text>
+  <text x="90" y="644" font-size="15" fill="#8a847a">16 kHz mono WAV &#183; 4 equal 5.86 s segments</text>
+  <text x="1230" y="644" font-size="15" fill="#8a847a" text-anchor="end">&#8594; beach_audio_sentiment_20250914_094846.csv</text>
+
+  <!-- rails: lanes -> fusion -->
+  <polyline points="1250,230 1340,230 1340,692" fill="none" stroke="#b0aaa0" stroke-width="2.5" marker-end="url(#mG)"/>
+  <polyline points="1250,416 1310,416 1310,692" fill="none" stroke="#b0aaa0" stroke-width="2.5" marker-end="url(#mG)"/>
+  <polyline points="1250,582 1280,582 1280,692" fill="none" stroke="#b0aaa0" stroke-width="2.5" marker-end="url(#mG)"/>
+  <text x="1245" y="680" font-size="17" fill="#cfc9bf" text-anchor="end">3 CSV streams + confidences</text>
+
+  <!-- bottom row (flows right to left, steps 4-7) -->
+  <rect x="1000" y="700" width="360" height="130" rx="14" fill="#0E9F7A"/>
+  <circle cx="1022" cy="726" r="13" fill="#E8A838"/>
+  <text x="1022" y="732" font-size="16" font-weight="bold" fill="#242220" text-anchor="middle">4</text>
+  <text x="1044" y="734" font-size="25" font-weight="bold" fill="#ffffff">Confidence weighting</text>
+  <text x="1020" y="764" font-size="18" fill="#e6e0d6">3 vision CSVs + 4 audio moods</text>
+  <text x="1020" y="790" font-size="18" fill="#e6e0d6">merged into one GPT prompt</text>
+  <text x="1020" y="816" font-size="18" fill="#e6e0d6">boost &gt;0.7 &#183; soften &lt;0.3</text>
+
+  <rect x="690" y="700" width="240" height="130" rx="14" fill="#B34A3E"/>
+  <circle cx="712" cy="726" r="13" fill="#E8A838"/>
+  <text x="712" y="732" font-size="16" font-weight="bold" fill="#242220" text-anchor="middle">5</text>
+  <text x="734" y="734" font-size="25" font-weight="bold" fill="#ffffff">GPT-3.5-turbo</text>
+  <text x="710" y="764" font-size="18" fill="#e6e0d6">Responses API</text>
+  <text x="710" y="790" font-size="18" fill="#e6e0d6">Suno-prompt writer</text>
+  <text x="710" y="816" font-size="18" fill="#e6e0d6">&#8804;200-char output</text>
+
+  <rect x="330" y="700" width="300" height="130" rx="14" fill="#B34A3E"/>
+  <circle cx="352" cy="726" r="13" fill="#E8A838"/>
+  <text x="352" y="732" font-size="16" font-weight="bold" fill="#242220" text-anchor="middle">6</text>
+  <text x="374" y="734" font-size="25" font-weight="bold" fill="#ffffff">Suno HackMIT API</text>
+  <text x="350" y="764" font-size="18" fill="#e6e0d6">POST /generate {topic}</text>
+  <text x="350" y="790" font-size="18" fill="#e6e0d6">make_instrumental: true</text>
+  <text x="350" y="816" font-size="18" fill="#e6e0d6">poll /clips 3 s &#183; &#8804;180 s</text>
+
+  <rect x="40" y="700" width="230" height="130" rx="14" fill="#B8842C"/>
+  <circle cx="62" cy="726" r="13" fill="#E8A838"/>
+  <text x="62" y="732" font-size="16" font-weight="bold" fill="#242220" text-anchor="middle">7</text>
+  <text x="82" y="734" font-size="25" font-weight="bold" fill="#ffffff">MoviePy merge</text>
+  <text x="60" y="764" font-size="18" fill="#e6e0d6">AudioLoop or trim</text>
+  <text x="60" y="790" font-size="18" fill="#e6e0d6">libx264 + AAC</text>
+  <text x="60" y="816" font-size="18" fill="#e6e0d6">output_video.mp4</text>
+
+  <line x1="1000" y1="765" x2="936" y2="765" stroke="#E8A838" stroke-width="3" marker-end="url(#mA)"/>
+  <text x="965" y="755" font-size="15" fill="#cfc9bf" text-anchor="middle">prompt</text>
+  <line x1="690" y1="765" x2="636" y2="765" stroke="#E8A838" stroke-width="3" marker-end="url(#mA)"/>
+  <text x="660" y="755" font-size="15" fill="#cfc9bf" text-anchor="middle">brief</text>
+  <line x1="330" y1="765" x2="276" y2="765" stroke="#9a948a" stroke-width="2.5" stroke-dasharray="7 7" marker-end="url(#mD)"/>
+  <text x="300" y="755" font-size="15" fill="#cfc9bf" text-anchor="middle">MP3</text>
+
+  <!-- legend -->
+  <line x1="70" y1="868" x2="115" y2="868" stroke="#E8A838" stroke-width="3"/>
+  <text x="125" y="874" font-size="17" fill="#cfc9bf">primary flow</text>
+  <line x1="300" y1="868" x2="345" y2="868" stroke="#b0aaa0" stroke-width="2.5"/>
+  <text x="355" y="874" font-size="17" fill="#cfc9bf">internal handoff</text>
+  <line x1="560" y1="868" x2="605" y2="868" stroke="#9a948a" stroke-width="2.5" stroke-dasharray="7 7"/>
+  <text x="615" y="874" font-size="17" fill="#cfc9bf">async / polling</text>
+
+  <text x="70" y="908" font-size="15" fill="#8a847a">Every number is a committed artifact: backend/test/imageData/*.csv &#183; backend/test/audioData/beach_audio_sentiment_20250914_094846.csv</text>
+  <text x="70" y="930" font-size="15" fill="#8a847a">Parameters: backend/main.py /video-to-video/ &#183; DataFromVideo.py &#183; audioAnalysis.py &#183; VideoToMusic.py &#183; SunoMusicGenerator.py (HackMIT 2025)</text>
+</svg>
