@@ -90,6 +90,8 @@ All three models run **locally on-device** (GPU preferred, CPU fallback) — no 
 ### 3. Confidence-Weighted Prompt Generation
 The three CSV outputs are aggregated and sent to **GPT** with a system prompt that instructs it to act as a film composer: convert visual scene descriptions into a concise music prompt (mood, genre, instrumentation, tempo). Each descriptor is weighted by its confidence score per time interval.
 
+<img src="docs/technique_fusion.svg" alt="Confidence-weighted fusion of YOLO, BLIP, VideoMAE, and CLAP outputs on a shared timeline" width="900"/>
+
 ### 4. AI Music Generation
 The music prompt is sent to **Suno AI** which generates a custom instrumental track. The backend polls until the clip is ready, then downloads the MP3.
 
@@ -114,6 +116,8 @@ The user gets two download options via signed Firebase Storage URLs:
 - **Automatic Audio/Video Mux** — Loop, trim, and merge with MoviePy (H.264 + AAC output)
 - **Download Options** — Separate track (MP3) or merged video (MP4) via signed URLs
 - **Dashboard** — Generation history with search, ordered by last update
+
+<img src="docs/technique_embeddings.svg" alt="CLAP zero-shot audio mood classification in a shared audio-text embedding space" width="900"/>
 
 ---
 
